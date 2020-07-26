@@ -1,0 +1,65 @@
+<!-- 스프링 5와 vue.js2로 시작하는 모던웹애플리케이션 개발 실습 -->
+<html>
+    <head>
+        <title>Messages App</title>
+        <style>
+            [v-cloak] {display: none;}
+            body > div {widows: 500px; margin: 0 auto;}
+            textarea {width:100%;}
+            ul {padding : 0 15px;}
+        </style>
+    </head>
+    <body>
+        <div id="app"  v-cloak>
+            <message-list :items="messages" @delete="deleteMessage"></message-list> <!-- :items는 v_bind:items와 같음-->
+            <ul>
+                <li v-for="message in messages">
+                    {{ message.text }} - {{ message.createdAt }}
+                    <button @click="deleteMessage(message)">X</button>  <!--@는 v-on:과 같은 기능을 함. 클릭 시 deleteMessage 수-->
+                </li>
+            </ul>
+            <form v-on:submit.prevent="addMessage"> <!--form을 쓰네..?-->
+                <textarea v-model="newMessage" placeholder="Leave a message"></textarea>
+                <div>
+                    <!--<button type="submit">Add</button>-->
+                    <!--<button v-bind:disabled="messages.length >= 10" type="submit">Add</button>-->  <!-- message list가 10 이상일 경우 버튼 방어하도록 bind-->
+                    <button :disabled="addDisabled" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+        <script type="module">
+             import MessageList from './components/MessageList.js';
+            let vm = new Vue({  // vue 선언
+                el: '#app',     // vue가 구현될 div id
+                data:{
+                    messages:[],
+                    newMessage:''
+                },
+                methods: {
+                    addMessage(event){
+                        if(!this.newMessage) {return;}
+                        this.messages.push({
+                            text: this.newMessage, createdAt : new Date()
+                        });
+                        this.newMessage = '';
+                            
+                    },
+                    deleteMessage(message){
+                        this.messages.splice(this.messages.indexOf(message), 1)
+                    }
+                },
+                computed:{  // computed는 연산 관련된 script 가 들어가나봄
+                    addDisabled(){
+                        return this.messages.length >= 10 || this.newMessage.length > 50; 
+                        
+                    }
+                },
+                components : {
+                    MessageList
+                }
+            });
+        </script>
+    </body>
+</html>
